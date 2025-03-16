@@ -14,7 +14,7 @@ cmd <- commandArgs(T)
 
 pheno.file <- cmd[1] #"toy_pheno.txt"
 global.kinship.file <- cmd[2] #"toy_global_IBD.RData"
-IBD_file <- cmd[3] #paste0("toy_chr20_IBD.txt")
+IBD_file <- cmd[3] #paste0("toy_chr20_IBD.txt.gz")
 outfile_prefix <- cmd[4] #"toy"
 seed = as.numeric(cmd[5]) #12345
 chr = as.numeric(cmd[6]) #20
