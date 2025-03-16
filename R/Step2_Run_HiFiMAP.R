@@ -1,8 +1,8 @@
 library(data.table)
 library(Matrix)
 library(rhdf5)
-source("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/FiMAP_process_chunk.R")
-source("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/pval_caculation_functions.R")
+source("FiMAP_process_chunk.R")
+source("pval_caculation_functions.R")
 
 cmd <- commandArgs(T)
 chr <- as.numeric(cmd[1]) # 1-22
@@ -15,9 +15,9 @@ chunk_inx = as.numeric(cmd[5])
 threads = as.numeric(cmd[6])
 
 Sys.setenv(MKL_NUM_THREADS=threads)
-IBD_h5file = paste0("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy_ibd_chr20.h5")
-pos_file = paste0("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy_ibd_chr20_CPos_index.txt")
-obj1 <- readRDS(paste0("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy_glmmkin2randomvec.rds"))
+IBD_h5file = paste0("toy_ibd_chr20.h5")
+pos_file = paste0("toy_ibd_chr20_CPos_index.txt")
+obj1 <- readRDS(paste0("toy_glmmkin2randomvec.rds"))
 
 set.seed(seed)
 
