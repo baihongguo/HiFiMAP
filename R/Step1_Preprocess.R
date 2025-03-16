@@ -1,8 +1,6 @@
 library(data.table)
 library(GMMAT)
 library(Matrix)
-#library(dplyr)
-#library(arrow)
 library(rhdf5)
 library(fastmatch)
 
