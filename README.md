@@ -10,4 +10,4 @@ Current version: 1.0.0
 
 ## Preparations
 The software is developed using R and tested in Linux environments. The statistical computing software R (>=4.0.0) and the following R packages are required:
-
+* [fastmatch](https://cran.r-project.org/web/packages/fastmatch/index.html))
