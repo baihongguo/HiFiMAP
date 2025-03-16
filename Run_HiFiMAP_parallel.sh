@@ -1,13 +1,13 @@
 #!/bin/bash
 seed=12345
 n_chunks=1
-outfile_prefix="/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy"
+outfile_prefix="toy"
 threads=4
 max_jobs=5
-script_name="Step2_Run_FiMAP.R"
+script_name="Step2_Run_HiFiMAP.R"
 chromosome=20 
 #chromosome=seq(1 22) 
-log_file="/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/FiMAP_log.txt"
+log_file="FiMAP_log.txt"
 
 
 # Ensure the log file exists
