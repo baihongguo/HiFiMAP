@@ -6,8 +6,8 @@ library(Matrix)
 library(rhdf5)
 library(fastmatch)
 
-source("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/glmmkin2randomvec.R")
-source("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/get_changing_positions_and_h5File.R")
+source("glmmkin2randomvec.R")
+source("get_changing_positions_and_h5File.R")
 
 
 cmd <- commandArgs(T)
