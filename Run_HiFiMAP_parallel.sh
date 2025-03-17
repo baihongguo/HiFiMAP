@@ -1,6 +1,6 @@
 #!/bin/bash
 seed=12345
-n_chunks=1
+n_chunks=5
 outfile_prefix="toy"
 threads=4
 max_jobs=5
