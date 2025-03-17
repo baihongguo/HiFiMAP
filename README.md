@@ -66,6 +66,7 @@ where the inputs are:
 
 This script will generate a .h5 IBD segment file a changing position index file: toy_ibd_chr20.h5 and toy_ibd_chr20_CPos_index.txt
 
+<br />
 
 ### Step2 Run HiFiMAP
 
