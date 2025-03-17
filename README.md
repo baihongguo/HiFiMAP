@@ -69,15 +69,15 @@ This script will generate a .h5 IBD segment file a changing position index file:
 <br />
 
 ### Step2 Run HiFiMAP
-The following shell script will perform HiFiMAP:
+The following shell script (Run_HiFiMAP_parallel.sh) will perform parallelized HiFiMAP:
 ```
 #!/bin/bash
 seed=12345
-n_chunks=1
+n_chunks=5
 outfile_prefix="/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy"
 threads=4
-max_jobs=5
-script_name="Step2_Run_FiMAP.R"
+min_jobs=5
+script_name="Step2_Run_HiFiMAP.R"
 chromosome=20 
 #chromosome=seq(1 22) 
 log_file="/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/FiMAP_log.txt"
@@ -108,8 +108,8 @@ for chr in $chromosome; do
     # Monitor running jobs for this chromosome
     while true; do
         running_jobs=$(pgrep -f "$script_name" | wc -l)
-        if [ "$running_jobs" -lt "$max_jobs" ]; then
-            echo "Less than $max_jobs jobs running. Proceeding to the next chromosome..."
+        if [ "$running_jobs" -lt "$min_jobs" ]; then
+            echo "Less than $min_jobs jobs running. Proceeding to the next chromosome..."
             break
         fi
         sleep 10  # Check every 10 seconds
@@ -168,4 +168,15 @@ echo "$chromosome, $wall_time, $total_cpu" >> "$log_file"
 
 echo "All processing and merging is complete"
 ```
+where the inputs are:
+| Argument  | Description |
+| ------------- | ------------- |
+| seed  | Random seed  |
+| n_chunks  | Number of chunks to divide the IBD segment into, for the purpose of paralized processing. Recommend to set it to 5-10 and set it to 1 means no paralized processing |
+| outfile_prefix | The prefix of the outout file |
+| min_jobs | This sets the minimum number of jobs currently running since each chunk finish analyis at different time. If less than min_jobs running, it will proceed to the next choromosme for the efficiency of genome-wide HiFiMAP |
+| script_name | This will be Step2_Run_HiFiMAP.R|
+| chromosome | chromosome |
+| log_file | The path and name of the log file, which records the wall time and CPU time for each chromosome |
+
 
