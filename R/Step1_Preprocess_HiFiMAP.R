@@ -1,21 +1,19 @@
 library(data.table)
 library(GMMAT)
 library(Matrix)
-#library(dplyr)
-#library(arrow)
 library(rhdf5)
 library(fastmatch)
 
-source("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/glmmkin2randomvec.R")
-source("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/get_changing_positions_and_h5File.R")
+source("glmmkin2randomvec.R")
+source("get_changing_positions_and_h5File.R")
 
 
 cmd <- commandArgs(T)
 
-pheno.file <- cmd[1] #"/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy_pheno.txt"
-global.kinship.file <- cmd[2] #"/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy_global_IBD.RData"
-IBD_file <- cmd[3] #paste0("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy_chr20_IBD.txt")
-outfile_prefix <- cmd[4] #"/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy"
+pheno.file <- cmd[1] #"toy_pheno.txt"
+global.kinship.file <- cmd[2] #"toy_global_IBD.RData"
+IBD_file <- cmd[3] #"toy_chr20_IBD.txt.gz"
+outfile_prefix <- cmd[4] #"toy"
 seed = as.numeric(cmd[5]) #12345
 chr = as.numeric(cmd[6]) #20
 id1.col = as.numeric(cmd[7]) #1
