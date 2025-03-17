@@ -74,13 +74,13 @@ The following shell script (Run_HiFiMAP_parallel.sh) will perform parallelized H
 #!/bin/bash
 seed=12345
 n_chunks=5
-outfile_prefix="/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/toy"
+outfile_prefix="toy"
 threads=4
 min_jobs=5
 script_name="Step2_Run_HiFiMAP.R"
 chromosome=20 
 #chromosome=seq(1 22) 
-log_file="/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/FiMAP_log.txt"
+log_file="FiMAP_log.txt"
 
 # Ensure the log file exists
 echo "Chr, Wall_Time(s), Total_CPU(s)" > "$log_file"
