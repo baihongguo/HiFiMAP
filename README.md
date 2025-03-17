@@ -172,11 +172,32 @@ where the inputs are:
 | Argument  | Description |
 | ------------- | ------------- |
 | seed  | Random seed  |
-| n_chunks  | Number of chunks to divide the IBD segment into, for the purpose of paralized processing. Recommend to set it to 5-10 and set it to 1 means no paralized processing |
+| n_chunks  | Number of chunks to divide the IBD segment into, for the purpose of paralized processing. Recommend to set it to 5-10, set it to 1 means no paralized processing |
 | outfile_prefix | The prefix of the outout file |
 | min_jobs | This sets the minimum number of jobs currently running since each chunk finish analyis at different time. If less than min_jobs running, it will proceed to the next choromosme for the efficiency of genome-wide HiFiMAP |
 | script_name | This will be Step2_Run_HiFiMAP.R|
 | chromosome | chromosome |
 | log_file | The path and name of the log file, which records the wall time and CPU time for each chromosome |
+Please modify these inputs in Run_FiMAP_parallel.sh for your own analysis.
 
+The script will generate a log file and a result file containing the following columns:
+```diff 
+chr pos n.ibd.segs p.value
+20 66532 8022 0.215780531425396
+20 71723 8286 0.235451653255488
+20 76361 8425 0.273023093580426
+20 82720 8543 0.28431254447582
+20 87903 8557 0.289574216210267
+```
 
+### Example
+Here is an example running HiFiMAP using the toy data set in the example folder
+* #### Step1 Preprocess the IBD segment file
+```diff 
+Rscript Step1_Preprocess_HiFiMAP.R toy_pheno.txt toy_global_kinship.RData toy_chr20_IBD.txt.gz toy 12345 20 1 2 3 4 5 0
+```
+
+* #### Step2 Run HiFiMAP
+```diff 
+bash Run_FiMAP_parallel.sh
+```
