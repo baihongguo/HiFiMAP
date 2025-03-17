@@ -178,9 +178,8 @@ where the inputs are:
 | script_name | This will be Step2_Run_HiFiMAP.R|
 | chromosome | chromosome |
 | log_file | The path and name of the log file, which records the wall time and CPU time for each chromosome |
-Please modify these inputs in Run_FiMAP_parallel.sh for your own analysis.
 
-The script will generate a log file and a result file containing the following columns:
+Please modify these inputs in Run_FiMAP_parallel.sh for your own analysis. This script will generate a log file and a result file containing the following columns:
 ```diff 
 chr pos n.ibd.segs p.value
 20 66532 8022 0.215780531425396
