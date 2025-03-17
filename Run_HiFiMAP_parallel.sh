@@ -3,7 +3,7 @@ seed=12345
 n_chunks=5
 outfile_prefix="toy"
 threads=4
-max_jobs=5
+min_jobs=5
 script_name="Step2_Run_HiFiMAP.R"
 chromosome=20 
 #chromosome=seq(1 22) 
@@ -37,8 +37,8 @@ for chr in $chromosome; do
     # Monitor running jobs for this chromosome
     while true; do
         running_jobs=$(pgrep -f "$script_name" | wc -l)
-        if [ "$running_jobs" -lt "$max_jobs" ]; then
-            echo "Less than $max_jobs jobs running. Proceeding to the next chromosome..."
+        if [ "$running_jobs" -lt "$min_jobs" ]; then
+            echo "Less than $min_jobs jobs running. Proceeding to the next chromosome..."
             break
         fi
         sleep 10  # Check every 10 seconds
