@@ -43,7 +43,7 @@ The global IBD(kinship) matrix saved in . RData format
 
 
 ### Step1 Preprocess the IBD segment file
-The following script transform the IBD segment file into the high performance hdf5 data format to improve the computational efficiency for running HiFiMAP. This step will generate a index file to record the local IBD changing positions (SNP locations), and the index of IBD segments overlapping each changing position(SNP).
+The following script transform the IBD segment file into the high performance hdf5 data format to improve the computational efficiency for running HiFiMAP. This step will generate a .h5 IBD segment file and a .txt index file to record the local IBD changing positions (SNP locations) and indices of IBD segments overlapping each changing position(SNP).
 
 ```diff 
 Rscript Step1_Preprocess_HiFiMAP.R toy_pheno.txt toy_global_kinship.RData toy_chr20_IBD.txt.gz toy 12345 20 1 2 3 4 5 0
