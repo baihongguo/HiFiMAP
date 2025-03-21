@@ -8,7 +8,7 @@ script_name="Step2_Run_HiFiMAP.R"
 chromosome=20 
 #chromosome=seq(1 22) 
 log_file="FiMAP_log.txt"
-
+infile_prefix="toy"
 
 # Ensure the log file exists
 echo "Chr, Wall_Time(s), Total_CPU(s)" > "$log_file"
