@@ -54,7 +54,7 @@ where the inputs are:
 | toy_pheno.txt | The pheno file |
 | toy_global_kinship.RData  | The global IBD(kinship) matrix  |
 | toy_chr20_IBD.txt.gz  | The IBD segment file  |
-| toy  | The prefix of the outout files  |
+| toy  | The prefix of the output files  |
 | 12345  | Random seed  |
 | 20  | Chromosome  |
 | 1 | Index of individual 1 column |
@@ -81,7 +81,8 @@ min_jobs=5
 script_name="Step2_Run_HiFiMAP.R"
 chromosome=20 
 #chromosome=seq(1 22) 
-log_file="FiMAP_log.txt"
+log_file="HiFiMAP_log.txt"
+infile_prefix="toy"
 
 ```
 | Argument  | Description |
@@ -93,6 +94,7 @@ log_file="FiMAP_log.txt"
 | script_name | This will be Step2_Run_HiFiMAP.R|
 | chromosome | chromosome |
 | log_file | The path and name of the log file, which records the wall time and CPU time for each chromosome |
+| infile_prefix | This will be the outfile_prefix in step 1 |
 
 Please modify these inputs in Run_FiMAP_parallel.sh for your own analysis. This script will generate a log file and a result file containing the following columns:
 ```diff 
