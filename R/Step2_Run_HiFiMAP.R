@@ -13,14 +13,14 @@ outfile.prefix <- cmd[3]
 n_chunks = as.numeric(cmd[4])
 chunk_inx = as.numeric(cmd[5])
 threads = as.numeric(cmd[6])
+infile.prefix = cmd[7]
 
 Sys.setenv(MKL_NUM_THREADS=threads)
-IBD_h5file = paste0("toy_ibd_chr20.h5")
-pos_file = paste0("toy_ibd_chr20_CPos_index.txt")
-obj1 <- readRDS(paste0("toy_glmmkin2randomvec.rds"))
+IBD_h5file = paste0(infile.prefix,"_ibd_chr",chr,".h5")
+pos_file = paste0(infile.prefix, "_ibd_chr",chr,"_CPos_index.txt")
+obj1 <- readRDS(paste0(infile.prefix, "_glmmkin2randomvec.rds"))
 
 set.seed(seed)
-
 
 if (n_chunks == 1) {
 changing_pos = fread(pos_file)
