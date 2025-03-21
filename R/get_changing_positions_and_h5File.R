@@ -1,4 +1,4 @@
-get_changing_positions_and_h5File = function(glmmkin.randomvec.obj, IBD_file, outfile_prefix, chr, id1.col = 1, id2.col = 2, chr.col = 3, start.col = 4, end.col = 5, IBD_sorted = 1){
+get_changing_positions_and_h5File = function(glmmkin.randomvec.obj, IBD_file, outfile_prefix, id1.col = 1, id2.col = 2, chr.col = 3, start.col = 4, end.col = 5, IBD_sorted = 1){
   find_first_overlap_idx <- function(val, end) {
     index <- which.max(val <= end)
   }
