@@ -46,7 +46,7 @@ rm(obj, tmpibd)
 saveRDS(obj1, file = paste0(outfile_prefix, "_glmmkin2randomvec.rds"))
 
 
-get_changing_positions_and_h5File(obj1, IBD_file, outfile_prefix, chr, id1.col, id2.col, chr.col, start.col, end.col, IBD_sorted)
+get_changing_positions_and_h5File(obj1, IBD_file, outfile_prefix, id1.col, id2.col, chr.col, start.col, end.col, IBD_sorted)
 
 
 
