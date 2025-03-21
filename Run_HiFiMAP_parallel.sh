@@ -29,7 +29,7 @@ for chr in $chromosome; do
         tmp_log="tmp_log_chr${chr}_chunk${i}.txt"
         resource_logs+=("$tmp_log")
         # Launch job wrapped with /usr/bin/time -v and redirect stderr to the log file
-        /usr/bin/time -v Rscript "$script_name" "$chr" "$seed" "$outfile_prefix" "$n_chunks" "$i" "$threads" 2> "$tmp_log" &
+        /usr/bin/time -v Rscript "$script_name" "$chr" "$seed" "$outfile_prefix" "$n_chunks" "$i" "$threads" "$infile_prefix" 2> "$tmp_log" &
        
         job_pids+=($!)  # Store PID of the last background job
     done
