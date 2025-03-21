@@ -15,13 +15,12 @@ global.kinship.file <- cmd[2] #"toy_global_IBD.RData"
 IBD_file <- cmd[3] #"toy_chr20_IBD.txt.gz"
 outfile_prefix <- cmd[4] #"toy"
 seed = as.numeric(cmd[5]) #12345
-chr = as.numeric(cmd[6]) #20
-id1.col = as.numeric(cmd[7]) #1
-id2.col = as.numeric(cmd[8]) #2
-chr.col = as.numeric(cmd[9]) #3
-start.col = as.numeric(cmd[10]) #4
-end.col = as.numeric(cmd[11]) #5
-IBD_sorted = as.numeric(cmd[12]) #0
+id1.col = as.numeric(cmd[6]) #1
+id2.col = as.numeric(cmd[7]) #2
+chr.col = as.numeric(cmd[8]) #3
+start.col = as.numeric(cmd[9]) #4
+end.col = as.numeric(cmd[10]) #5
+IBD_sorted = as.numeric(cmd[11]) #0
 
 
 N.randomvec <- 100
