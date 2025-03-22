@@ -109,7 +109,7 @@ chr pos n.ibd.segs p.value
 Here is an example running HiFiMAP using the toy data set in the example folder
 * #### Step1 Preprocess the IBD segment file
 ```diff 
-Rscript Step1_Preprocess_HiFiMAP.R toy_pheno.txt toy_global_kinship.RData toy_chr20_IBD.txt.gz toy 12345 20 1 2 3 4 5 0
+Rscript Step1_Preprocess_HiFiMAP.R toy_pheno.txt toy_global_kinship.RData toy_chr20_IBD.txt.gz toy 12345 1 2 3 4 5 0
 ```
 
 * #### Step2 Run HiFiMAP
