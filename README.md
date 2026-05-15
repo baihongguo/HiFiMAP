@@ -58,7 +58,7 @@ python3 src/hapIBD_parsing/parsing_hapIBD.py \
 | `--output` | The directory where the chunked matrices and diffs will be saved. |
 | `--n-checkpoints` | Number of chunks to divide the chromosome into (e.g., `20`). This controls parallelization scaling in Step 2. Set this number to be less than the number of CPUs you have for better performance, recommended is 20-30. |
 
-*(This will generate a folder `example/ibd_prep/chr21` containing `sites.txt`, `samples.txt`, and the chunked `.mtx` / `.diff` files).*
+*(This will generate a folder `example/ibd_prep/chr21` containing `sites.txt` (bp of each testing site), `samples.txt` (individual IDs for matching with the null model), and the chunked `.mtx` / `.diff` files).*
 
 <br />
 
