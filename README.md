@@ -112,7 +112,36 @@ mkdir -p "$OUT_BASE"
 # EXECUTION
 # ==========================================
 for chr in $target_chromosomes; do
-    echo "Launching chunks for Chromosome $chr..."
+    echo "=========================================="
+    echo "Processing Chromosome $chr..."
+    echo "=========================================="
+    
+    # ---------------------------------------------------------
+    # ALIGNMENT FIX: Rename Python outputs to sequential chunks
+    # ---------------------------------------------------------
+    echo "Aligning .mtx and .diff files to sequential chunks..."
+    chunk_count=1
+    
+    # Use sort -V to ensure natural numeric sorting (e.g., 250 comes before 1000)
+    for mtx_file in $(ls ${IBD_PREP_BASE}/chr${chr}/ibd_mat_*.mtx 2>/dev/null | sort -V); do
+        # Extract the actual site number from the filename
+        site_num=$(basename "$mtx_file" | grep -o -E '[0-9]+')
+        
+        # Only rename if it isn't already the correct sequential chunk number
+        if [ "$site_num" != "$chunk_count" ]; then
+            mv "${IBD_PREP_BASE}/chr${chr}/ibd_mat_${site_num}.mtx" "${IBD_PREP_BASE}/chr${chr}/ibd_mat_${chunk_count}.mtx"
+            
+            # Also rename the corresponding .diff file
+            if [ -f "${IBD_PREP_BASE}/chr${chr}/delta_${site_num}.diff" ]; then
+                mv "${IBD_PREP_BASE}/chr${chr}/delta_${site_num}.diff" "${IBD_PREP_BASE}/chr${chr}/delta_${chunk_count}.diff"
+            fi
+        fi
+        ((chunk_count++))
+    done
+    echo "Alignment complete."
+    # ---------------------------------------------------------
+
+    echo "Launching jobs for Chromosome $chr..."
     
     for chunk in $(seq 1 $n_analysis_chunks); do
         
