@@ -69,7 +69,7 @@ Next, fit the null model using your phenotypes and global kinship matrix. **This
 Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
     example/toy_phenotype.txt \
     example/toy_global_kinship.RData \
-    chr21_toy_pheno \
+    toy_pheno \
     12345
 ```
 
