@@ -4,7 +4,7 @@ High resolution fast identity-by-descent (IBD) mapping test
 Current version: 2.0.0 (Optimized Streaming Pipeline)
 
 ## Overview
-The new HiFiMAP pipeline has been completely rebuilt for massive scalability and memory efficiency. It uses a highly optimized Python preparser to convert IBD segments into chunked sparse matrices (`.mtx`) and differential updates (`.diff`). The main R package utilizes C++ (`Rcpp`) to stream these updates, allowing for fast, parallelized genome-wide association testing without frequently loading massive IBD matrices into RAM.
+The new HiFiMAP pipeline has been rebuilt for scalability and efficiency. It uses a highly optimized Python preparser to convert IBD segments into chunked sparse matrices (`.mtx`) and differential updates (`.diff`). The main R package utilizes C++ (`Rcpp`) to stream these updates, allowing for fast, parallelized genome-wide association testing without frequently loading massive IBD matrices into RAM.
 
 ## Quick Installation 
 
