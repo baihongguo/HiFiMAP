@@ -1,5 +1,5 @@
 # HiFiMAP
-High resolution fast identity-by-descent (IBD) mapping
+High resolution fast identity-by-descent (IBD) mapping test
 <br />
 Current version: 2.0.0 (Optimized Streaming Pipeline)
 
