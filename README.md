@@ -10,7 +10,7 @@ The new HiFiMAP pipeline has been rebuilt for scalability and efficiency. It use
 
 `HiFiMAP` can be downloaded via:
 ```bash
-git clone [https://github.com/baihongguo/HiFiMAP](https://github.com/baihongguo/HiFiMAP)
+git clone [https://github.com/hanchenlab/HiFiMAP](https://github.com/hanchenlab/HiFiMAP)
 ```
 
 ## Preparations
