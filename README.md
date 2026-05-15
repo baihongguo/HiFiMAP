@@ -77,7 +77,7 @@ Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
 | ------------- | ------------- |
 | `phenotype.txt` | The file containing ID, Phenotype, and covariates. |
 | `global_kinship.RData` | The global kinship matrix saved in `.RData` format. Row names and col names should be the corresponding subject IDs |
-| `chr21_toy_pheno` | Prefix for the output file. |
+| `toy_pheno` | Prefix for the output file. |
 | `12345` | Random seed for reproducibility. |
 
 *(This generates the null model object: `toy_pheno_glmmkin2randomvec.rds` in your root directory. The subjects in the phenotype file can be a subset of the individuals included in your vcf files used for step0 and hapIBD).*
@@ -103,7 +103,7 @@ target_chromosomes="21"
 
 OUT_BASE="./results"
 IBD_PREP_BASE="./example/ibd_prep"
-GLMM_RDS="chr21_toy_pheno_glmmkin2randomvec.rds"
+GLMM_RDS="toy_pheno_glmmkin2randomvec.rds"
 script_name="src/HiFiMAP/Step2_Run_HiFiMAP.R"
 
 mkdir -p "$OUT_BASE"
