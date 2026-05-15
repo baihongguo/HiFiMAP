@@ -53,7 +53,7 @@ python3 reformat_ibds_v1.3.py \
 | `--ibd` | The IBD segment file output from hapIBD. |
 | `--vcf` | The reference VCF file to extract exact SNP positions and sample IDs. |
 | `--output` | The directory where the chunked matrices and diffs will be saved. |
-| `--n-checkpoints` | Number of chunks to divide the chromosome into (e.g., `20`). This controls parallelization scaling in Step 2. |
+| `--n-checkpoints` | Number of chunks to divide the chromosome into (e.g., `20`). This controls parallelization scaling in Step 2. Set this number to be less than the number of CPU you have for better performance, recommended is 20-30. |
 
 *(This will generate a folder `./ibd_prep/chr21` containing `sites.txt`, `samples.txt`, and the chunked `.mtx` / `.diff` files).*
 
