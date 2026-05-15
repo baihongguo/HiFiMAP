@@ -103,7 +103,7 @@ target_chromosomes="21"
 
 OUT_BASE="./results"
 IBD_PREP_BASE="./example/ibd_prep"
-GLMM_RDS="toy_pheno_glmmkin2randomvec.rds"
+GLMM_RDS="chr21_toy_pheno_glmmkin2randomvec.rds"
 script_name="src/HiFiMAP/Step2_Run_HiFiMAP.R"
 
 mkdir -p "$OUT_BASE"
