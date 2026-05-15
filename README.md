@@ -1,118 +1,167 @@
 # HiFiMAP
-High resolution fast identity-by-descent mapping (HiFiMAP)
+High resolution fast identity-by-descent (IBD) mapping
 <br />
-Current version: 1.0.0
+Current version: 2.0.0 (Optimized Streaming Pipeline)
+
+## Overview
+The new HiFiMAP pipeline has been completely rebuilt for massive scalability and memory efficiency. It uses a highly optimized Python preparser to convert IBD segments into chunked sparse matrices (`.mtx`) and differential updates (`.diff`). The main R package utilizes C++ (`Rcpp`) to stream these updates, allowing for extremely fast, parallelized genome-wide association testing without loading massive IBD matrices into RAM.
 
 ## Quick Installation 
 
-`HiFiMAP` can be downloaded via `git clone https://https://github.com/baihongguo/HiFiMAP`
+`HiFiMAP` can be downloaded via:
+```bash
+git clone [https://github.com/baihongguo/HiFiMAP](https://github.com/baihongguo/HiFiMAP)
+```
 
 ## Preparations
-The software is developed using R and tested in Linux environments. The statistical computing software R (>=4.0.0) and the following R packages are required:
-* [fastmatch](https://cran.r-project.org/web/packages/fastmatch/index.html) (>=1.1-6)
-* [GMMAT](https://cran.r-project.org/web/packages/GMMAT/index.html) (>=1.3.2)
-* [rhdf5](https://github.com/grimbough/rhdf5) (>=2.32.4)
+The software is developed and tested in Linux HPC environments. 
 
-## Usage
-### Input Files
-* #### Pheno file
-The file containing the phenotype, individual ID and covariates:
-```diff 
-id covar pheno
-0 -12.8758 0.137011197818403
-1 -12.1141 -0.280733839831654
-2 -12.3981 -0.103265188894815
-3 -11.5917 0.224730939351052
+**Python Dependencies (Python >= 3.6):**
+* `numpy`
+
+**R Dependencies (R >= 4.0.0):**
+* `data.table`
+* `Matrix`
+* `fastmatch`
+* `GMMAT`
+* `Rcpp`
+* `CompQuadForm`
+
+---
+
+## Usage & Example Pipeline
+
+Suppose you have an `example` folder containing the following files for Chromosome 21:
+* `chr21_p_smoother_hap_ibd_res_3cm.ibd`: IBD segments generated from hapIBD.
+* `chr21_reference.vcf.gz`: The corresponding VCF file used to generate the IBDs.
+* `phenotype.txt`: Contains individual IDs, phenotype, and covariates (e.g., age, sex).
+* `global_kinship.RData`: The global IBD (kinship) matrix.
+
+### Step 0: Pre-parse the IBD Segments (Python)
+This step transforms the raw IBD segments into high-performance sparse matrices and delta differences. It automatically chunks the chromosome to allow for parallel processing in Step 2.
+
+```bash
+python3 reformat_ibds_v1.3.py \
+    --ibd chr21_p_smoother_hap_ibd_res_3cm.ibd \
+    --vcf chr21_reference.vcf.gz \
+    --output ./ibd_prep/chr21 \
+    --n-checkpoints 20
 ```
 
-* #### IBD segments file
-The output IBD segment file from the IBD detection tools, containing at least the following columns:
-```diff 
-individual_1_id individual_2_id chromosome_id ibd_physical_position_start ibd_physical_position_end
-1004 5 20 66532 354440
-975 21 20 66532 354440
-975 36 20 66532 354440
-663 38 20 66532 354440
-689 38 20 66532 354440
-```
-
-
-* #### Global IBD matrix
-The global IBD(kinship) matrix saved in . RData format
-
-
-
-### Step1 Preprocess the IBD segment file
-The following script transform the IBD segment file into the high performance hdf5 data format to improve the computational efficiency for running HiFiMAP. This step will generate a .h5 IBD segment file and a .txt index file to record the local IBD changing positions (SNP locations) and indices of IBD segments overlapping each changing position(SNP).
-
-```diff 
-Rscript Step1_Preprocess_HiFiMAP.R toy_pheno.txt toy_global_kinship.RData toy_chr20_IBD.txt.gz toy 12345 1 2 3 4 5 0
-```
-where the inputs are:
-| Value  | Description |
+| Argument | Description |
 | ------------- | ------------- |
-| toy_pheno.txt | The pheno file |
-| toy_global_kinship.RData  | The global IBD(kinship) matrix  |
-| toy_chr20_IBD.txt.gz  | The IBD segment file  |
-| toy  | The prefix of the output files  |
-| 12345  | Random seed  |
-| 1 | Index of individual 1 column |
-| 2 | Index of individual 2 column |
-| 3 | Index of Chromosome column |
-| 4 | Index of IBD start position column |
-| 5 | Index of IBD end position column |
-| 0 | 0 means unsorted IBD segment file (by start and end position column), 1 means sorted|
+| `--ibd` | The IBD segment file output from hapIBD. |
+| `--vcf` | The reference VCF file to extract exact SNP positions and sample IDs. |
+| `--output` | The directory where the chunked matrices and diffs will be saved. |
+| `--n-checkpoints` | Number of chunks to divide the chromosome into (e.g., `20`). This controls parallelization scaling in Step 2. |
 
-This script will generate a .h5 IBD segment file a changing position index file: toy_ibd_chr20.h5 and toy_ibd_chr20_CPos_index.txt
+*(This will generate a folder `./ibd_prep/chr21` containing `sites.txt`, `samples.txt`, and the chunked `.mtx` / `.diff` files).*
 
 <br />
 
-### Step2 Run HiFiMAP
-The shell script Run_HiFiMAP_parallel.sh will perform parallelized HiFiMAP, and the inputs are:
+### Step 1: Fit the Null GLMM Model (R)
+Next, fit the null model using your phenotypes and global kinship matrix. **This step only needs to be run once per phenotype**, regardless of how many chromosomes you analyze.
 
+```bash
+Rscript Step1_Preprocess_HiFiMAP.R \
+    phenotype.txt \
+    global_kinship.RData \
+    toy_pheno \
+    12345
 ```
-#!/bin/bash
-seed=12345
-n_chunks=5
-outfile_prefix="toy"
-threads=4
-min_jobs=5
-script_name="Step2_Run_HiFiMAP.R"
-chromosome=20 
-#chromosome=seq(1 22) 
-log_file="HiFiMAP_log.txt"
-infile_prefix="toy"
 
-```
-| Argument  | Description |
+| Argument | Description |
 | ------------- | ------------- |
-| seed  | Random seed  |
-| n_chunks  | Number of chunks to divide the IBD segment into, for the purpose of paralized processing. Recommend to set it to 5-10, set it to 1 means no paralized processing |
-| outfile_prefix | The prefix of the outout file |
-| min_jobs | This sets the minimum number of jobs currently running since each chunk finish analyis at different time. If less than min_jobs running, it will proceed to the next choromosme for the efficiency of genome-wide HiFiMAP |
-| script_name | This will be Step2_Run_HiFiMAP.R|
-| chromosome | chromosome |
-| log_file | The path and name of the log file, which records the wall time and CPU time for each chromosome |
-| infile_prefix | This will be the outfile_prefix in step 1 |
+| `phenotype.txt` | The file containing ID, Phenotype, and covariates. |
+| `global_kinship.RData` | The global kinship matrix saved in `.RData` format. |
+| `toy_pheno` | Prefix for the output file. |
+| `12345` | Random seed for reproducibility. |
 
-Please modify these inputs in Run_FiMAP_parallel.sh for your own analysis. This script will generate a log file and a result file containing the following columns:
-```diff 
-chr pos n.ibd.segs p.value
-20 66532 8022 0.215780531425396
-20 71723 8286 0.235451653255488
-20 76361 8425 0.273023093580426
-20 82720 8543 0.28431254447582
-20 87903 8557 0.289574216210267
+*(This generates the null model object: `toy_pheno_glmmkin2randomvec.rds`).*
+
+<br />
+
+### Step 2: Run Parallelized HiFiMAP Scan (Bash wrapper)
+To run the actual association scan efficiently across all chunks, create a bash wrapper script (e.g., `Run_HiFiMAP_Parallel.sh`) with the following contents:
+
+```bash
+#!/bin/bash
+
+# ==========================================
+# CONFIGURATION
+# ==========================================
+n_analysis_chunks=20   # MUST MATCH the --n-checkpoints used in Step 0
+min_jobs=4             # Throttle: launch next chunks when active jobs < min_jobs
+seed=12345
+threads=4
+target_chromosomes="21"
+
+OUT_BASE="./results"
+IBD_PREP_BASE="./ibd_prep"
+GLMM_RDS="toy_pheno_glmmkin2randomvec.rds"
+script_name="Step2_Run_HiFiMAP_Direct_Parallel_flexible.R"
+
+mkdir -p "$OUT_BASE"
+
+# ==========================================
+# EXECUTION
+# ==========================================
+for chr in $target_chromosomes; do
+    echo "Launching chunks for Chromosome $chr..."
+    
+    for chunk in $(seq 1 $n_analysis_chunks); do
+        
+        # Queue Management
+        running_jobs=$(pgrep -f "$script_name" | wc -l)
+        if [ "$running_jobs" -ge "$min_jobs" ]; then
+            while [ "$running_jobs" -ge "$min_jobs" ]; do
+                sleep 5
+                running_jobs=$(pgrep -f "$script_name" | wc -l)
+            done
+        fi
+        
+        # Launch Chunk in background
+        out_file="${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk${chunk}.txt"
+        
+        Rscript "$script_name" \
+            "$chr" "$seed" "toy_pheno" "$threads" \
+            "$GLMM_RDS" "${IBD_PREP_BASE}/chr${chr}" \
+            "$chunk" "$n_analysis_chunks" > "${out_file}.log" 2>&1 &
+            
+    done
+    
+    # Wait for all chunks on this chromosome to finish
+    wait 
+    
+    # Merge chunks
+    echo "Merging results for Chromosome $chr..."
+    final_out="${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}.txt"
+    chunk1="${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk1.txt"
+    
+    if [ -f "$chunk1" ]; then
+        head -n 1 "$chunk1" > "$final_out"
+        for chunk in $(seq 1 $n_analysis_chunks); do
+            tail -n +2 -q "${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk${chunk}.txt" >> "$final_out"
+            rm "${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk${chunk}.txt"* # Cleanup
+        done
+    fi
+done
+
+echo "Pipeline Complete!"
 ```
 
-### Example
-Here is an example running HiFiMAP using the toy data set in the example folder
-* #### Step1 Preprocess the IBD segment file
-```diff 
-Rscript Step1_Preprocess_HiFiMAP.R toy_pheno.txt toy_global_kinship.RData toy_chr20_IBD.txt.gz toy 12345 1 2 3 4 5 0
+Execute the wrapper script:
+```bash
+bash Run_HiFiMAP_Parallel.sh
 ```
 
-* #### Step2 Run HiFiMAP
-```diff 
-bash Run_FiMAP_parallel.sh
+### Final Output
+The final merged result file (`results/HiFiMAP_toy_pheno_chr21.txt`) will contain the association statistics for every tested site:
+
+```text 
+chr     pos       n.ibd.segs    p.value
+21      9411239   104523        0.83120
+21      9411255   104526        0.82901
+21      9411261   104550        0.65103
+21      9411300   104811        0.00312
 ```
