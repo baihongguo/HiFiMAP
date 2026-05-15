@@ -77,7 +77,7 @@ Rscript Step1_Preprocess_HiFiMAP.R \
 | `toy_pheno` | Prefix for the output file. |
 | `12345` | Random seed for reproducibility. |
 
-*(This generates the null model object: `toy_pheno_glmmkin2randomvec.rds`).*
+*(This generates the null model object: `toy_pheno_glmmkin2randomvec.rds`, the subjects in the phenotype.txt can be a subset of the individuals included in your vcf files used for step0 and hapIBD).*
 
 <br />
 
