@@ -545,6 +545,10 @@ def main():
                        help="Auto-calculate delta to produce this many checkpoint matrices.")
     args = parser.parse_args()
 
+    # Automatically enable subsampling if the user asks for checkpoints
+    if args.n_checkpoints is not None:
+        args.subsample = True
+
     try:
         compute_diff(
             ibd_file=args.ibd,
