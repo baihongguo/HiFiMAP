@@ -31,20 +31,23 @@ The software is developed and tested in Linux HPC environments.
 
 ## Usage & Example Pipeline
 
-Suppose you have an `example` folder containing the following files for Chromosome 21:
-* `chr21_p_smoother_hap_ibd_res_3cm.ibd`: IBD segments generated from [hapIBD](https://github.com/browning-lab/hap-ibd).
-* `chr21_reference.vcf.gz`: The corresponding VCF file used to generate the IBDs.
-* `phenotype.txt`: Contains individual IDs, phenotype, and covariates (e.g., age, sex).
-* `global_kinship.RData`: The global IBD (kinship) matrix.
+Based on the repository structure, all test files are located in the `example/` directory, and all source codes are in the `src/` directory. Suppose you want to run an analysis for Chromosome 21 using the provided toy data:
+
+* `example/toy.ibd.gz`: IBD segments generated from [hapIBD](https://github.com/browning-lab/hap-ibd).
+* `example/toy.vcf.gz`: The corresponding VCF file used to generate the IBDs.
+* `example/toy_phenotype.txt`: Contains individual IDs, phenotype, and covariates (e.g., age, sex).
+* `example/toy_global_kinship.RData`: The global IBD (kinship) matrix.
 
 ### Step 0: Pre-parse the IBD Segments (Python)
 This step transforms the raw IBD segments into high-performance sparse matrices and delta differences. It automatically chunks the chromosome to allow for parallel processing in Step 2.
 
+Run the parser from the root of the repository:
+
 ```bash
-python3 reformat_ibds_v1.3.py \
-    --ibd chr21_p_smoother_hap_ibd_res_3cm.ibd \
-    --vcf chr21_reference.vcf.gz \
-    --output ./ibd_prep/chr21 \
+python3 src/hapIBD_parsing/parsing_hapIBD.py \
+    --ibd example/toy.ibd.gz \
+    --vcf example/toy.vcf.gz \
+    --output example/ibd_prep/chr21 \
     --n-checkpoints 20
 ```
 
@@ -53,9 +56,9 @@ python3 reformat_ibds_v1.3.py \
 | `--ibd` | The IBD segment file output from hapIBD. |
 | `--vcf` | The reference VCF file to extract exact SNP positions and sample IDs. |
 | `--output` | The directory where the chunked matrices and diffs will be saved. |
-| `--n-checkpoints` | Number of chunks to divide the chromosome into (e.g., `20`). This controls parallelization scaling in Step 2. Set this number to be less than the number of CPU you have for better performance, recommended is 20-30. |
+| `--n-checkpoints` | Number of chunks to divide the chromosome into (e.g., `20`). This controls parallelization scaling in Step 2. Set this number to be less than the number of CPUs you have for better performance, recommended is 20-30. |
 
-*(This will generate a folder `./ibd_prep/chr21` containing `sites.txt`, `samples.txt`, and the chunked `.mtx` / `.diff` files).*
+*(This will generate a folder `example/ibd_prep/chr21` containing `sites.txt`, `samples.txt`, and the chunked `.mtx` / `.diff` files).*
 
 <br />
 
@@ -63,9 +66,9 @@ python3 reformat_ibds_v1.3.py \
 Next, fit the null model using your phenotypes and global kinship matrix. **This step only needs to be run once per phenotype**, regardless of how many chromosomes you analyze.
 
 ```bash
-Rscript Step1_Preprocess_HiFiMAP.R \
-    phenotype.txt \
-    global_kinship.RData \
+Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
+    example/toy_phenotype.txt \
+    example/toy_global_kinship.RData \
     toy_pheno \
     12345
 ```
@@ -77,12 +80,14 @@ Rscript Step1_Preprocess_HiFiMAP.R \
 | `toy_pheno` | Prefix for the output file. |
 | `12345` | Random seed for reproducibility. |
 
-*(This generates the null model object: `toy_pheno_glmmkin2randomvec.rds`, the subjects in the phenotype.txt can be a subset of the individuals included in your vcf files used for step0 and hapIBD).*
+*(This generates the null model object: `toy_pheno_glmmkin2randomvec.rds` in your root directory. The subjects in the phenotype file can be a subset of the individuals included in your vcf files used for step0 and hapIBD).*
 
 <br />
 
 ### Step 2: Run Parallelized HiFiMAP Scan (Bash wrapper)
-To run the actual association scan efficiently across all chunks, create a bash wrapper script (e.g., `Run_HiFiMAP_Parallel.sh`) with the following contents:
+To run the actual association scan efficiently across all chunks, you can use the `Run_HiFiMAP_parallel.sh` wrapper script. 
+
+Make sure the configuration inside `Run_HiFiMAP_parallel.sh` points to the correct `src` paths and `example` outputs:
 
 ```bash
 #!/bin/bash
@@ -97,9 +102,9 @@ threads=4
 target_chromosomes="21"
 
 OUT_BASE="./results"
-IBD_PREP_BASE="./ibd_prep"
+IBD_PREP_BASE="./example/ibd_prep"
 GLMM_RDS="toy_pheno_glmmkin2randomvec.rds"
-script_name="Step2_Run_HiFiMAP_Direct_Parallel_flexible.R"
+script_name="src/HiFiMAP/Step2_Run_HiFiMAP.R"
 
 mkdir -p "$OUT_BASE"
 
@@ -148,11 +153,6 @@ for chr in $target_chromosomes; do
 done
 
 echo "Pipeline Complete!"
-```
-
-Execute the wrapper script:
-```bash
-bash Run_HiFiMAP_Parallel.sh
 ```
 
 ### Final Output
