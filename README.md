@@ -50,7 +50,7 @@ python3 reformat_ibds_v1.3.py \
 
 | Argument | Description |
 | ------------- | ------------- |
-| `--ibd` | The IBD segment file output from hapIBD. |
+| `--ibd` | The IBD segment file output from [hapIBD](https://github.com/browning-lab/hap-ibd). |
 | `--vcf` | The reference VCF file to extract exact SNP positions and sample IDs. |
 | `--output` | The directory where the chunked matrices and diffs will be saved. |
 | `--n-checkpoints` | Number of chunks to divide the chromosome into (e.g., `20`). This controls parallelization scaling in Step 2. Set this number to be less than the number of CPU you have for better performance, recommended is 20-30. |
