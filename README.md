@@ -31,10 +31,10 @@ The software is developed and tested in Linux HPC environments.
 
 ## Usage & Example Pipeline
 
-Based on the repository structure, all test files are located in the `example/` directory, and all source codes are in the `src/` directory. Suppose you want to run an analysis for Chromosome 21 using the provided toy data:
+Based on the repository structure, all test files are located in the `example/` directory, and all source codes are in the `src/` directory. Suppose you want to run a test analysis for chromosome 21 using the provided toy data:
 
-* `example/toy.ibd.gz`: IBD segments generated from [hapIBD](https://github.com/browning-lab/hap-ibd).
-* `example/toy.vcf.gz`: The corresponding VCF file used to generate the IBDs.
+* `example/chr21_toy.ibd.gz`: IBD segments generated from [hapIBD](https://github.com/browning-lab/hap-ibd).
+* `example/chr21_toy.vcf.gz`: The corresponding VCF file used to generate the IBDs.
 * `example/toy_phenotype.txt`: Contains individual IDs, phenotype, and covariates (e.g., age, sex).
 * `example/toy_global_kinship.RData`: The global IBD (kinship) matrix.
 
@@ -45,8 +45,8 @@ Run the parser from the root of the repository:
 
 ```bash
 python3 src/hapIBD_parsing/parsing_hapIBD.py \
-    --ibd example/toy.ibd.gz \
-    --vcf example/toy.vcf.gz \
+    --ibd example/chr21_toy.ibd.gz \
+    --vcf example/chr21_toy.vcf.gz \
     --output example/ibd_prep/chr21 \
     --n-checkpoints 20
 ```
@@ -69,7 +69,7 @@ Next, fit the null model using your phenotypes and global kinship matrix. **This
 Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
     example/toy_phenotype.txt \
     example/toy_global_kinship.RData \
-    toy_pheno \
+    chr21_toy_pheno \
     12345
 ```
 
@@ -77,7 +77,7 @@ Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
 | ------------- | ------------- |
 | `phenotype.txt` | The file containing ID, Phenotype, and covariates. |
 | `global_kinship.RData` | The global kinship matrix saved in `.RData` format. |
-| `toy_pheno` | Prefix for the output file. |
+| `chr21_toy_pheno` | Prefix for the output file. |
 | `12345` | Random seed for reproducibility. |
 
 *(This generates the null model object: `toy_pheno_glmmkin2randomvec.rds` in your root directory. The subjects in the phenotype file can be a subset of the individuals included in your vcf files used for step0 and hapIBD).*
