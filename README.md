@@ -76,7 +76,7 @@ Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
 | Argument | Description |
 | ------------- | ------------- |
 | `phenotype.txt` | The file containing ID, Phenotype, and covariates. |
-| `global_kinship.RData` | The global kinship matrix saved in `.RData` format. Row names and col names should be the corresponding subject IDs |
+| `global_kinship.RData` | The kinship matrix saved in `.RData` format. Row names and col names should be the corresponding subject IDs |
 | `toy_pheno` | Prefix for the output file. |
 | `12345` | Random seed for reproducibility. |
 
