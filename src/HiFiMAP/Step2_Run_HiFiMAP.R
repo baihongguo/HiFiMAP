@@ -19,16 +19,14 @@ read_diff_as_dK <- function(diff_file, n_hap) {
 # --- MAIN ---
 cmd <- commandArgs(trailingOnly = TRUE)
 chr            <- as.numeric(cmd[1])
-seed           <- as.numeric(cmd[2])
-outfile_prefix <- cmd[3]
-threads        <- as.numeric(cmd[4])
-glmm_rds_path  <- cmd[5]
-ibd_dir        <- cmd[6] 
-start_idx      <- as.numeric(cmd[7])
-end_idx        <- as.numeric(cmd[8])
+outfile_prefix <- cmd[2]
+threads        <- as.numeric(cmd[3])
+glmm_rds_path  <- cmd[4]
+ibd_dir        <- cmd[5] 
+start_idx      <- as.numeric(cmd[6])
+end_idx        <- as.numeric(cmd[7])
 
 Sys.setenv(MKL_NUM_THREADS = threads)
-set.seed(seed)
 
 t1 <- proc.time()
 
