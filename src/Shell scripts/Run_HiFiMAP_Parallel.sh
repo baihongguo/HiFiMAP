@@ -2,10 +2,10 @@
 
 # ==========================================
 # CONFIGURATION
+threads=2
 # ==========================================
 # Set the number of threads for matrix operations in R via Sys.setenv(MKL_NUM_THREADS = threads).
 # NOTE: This is only effective if R is compiled with the Intel Math Kernel Library (MKL).
-threads=2
 target_chromosomes="21"
 
 OUT_BASE="./results"
