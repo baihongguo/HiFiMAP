@@ -11,6 +11,7 @@ The new HiFiMAP pipeline has been rebuilt for scalability and efficiency. It use
 `HiFiMAP` can be downloaded via:
 ```bash
 git clone https://github.com/hanchenlab/HiFiMAP
+cd HiFiMAP
 ```
 
 ## Preparations
