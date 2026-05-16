@@ -96,7 +96,6 @@ Make sure the configuration inside `Run_HiFiMAP_parallel.sh` points to the corre
 # ==========================================
 # CONFIGURATION
 # ==========================================
-seed=12345
 # Set the number of threads for matrix operations in R via Sys.setenv(MKL_NUM_THREADS = threads).
 # NOTE: This is only effective if R is compiled with the Intel Math Kernel Library (MKL).
 threads=2
@@ -155,7 +154,6 @@ for chr in $target_chromosomes; do
 
         Rscript "$script_name" \
             "$chr" \
-            "$seed" \
             "$outfile_prefix" \
             "$threads" \
             "$GLMM_RDS" \
