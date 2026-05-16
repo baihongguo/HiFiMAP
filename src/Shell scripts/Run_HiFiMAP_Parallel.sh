@@ -61,7 +61,6 @@ for chr in $target_chromosomes; do
 
         Rscript "$script_name" \
             "$chr" \
-            "$seed" \
             "$outfile_prefix" \
             "$threads" \
             "$GLMM_RDS" \
