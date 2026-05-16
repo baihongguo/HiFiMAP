@@ -3,89 +3,93 @@
 # ==========================================
 # CONFIGURATION
 # ==========================================
-n_analysis_chunks=20   # MUST MATCH the --n-checkpoints used in Step 0
-min_jobs=4             # Throttle: launch next chunks when active jobs < min_jobs
-seed=12345
-threads=4
+# Set the number of threads for matrix operations in R via Sys.setenv(MKL_NUM_THREADS = threads).
+# NOTE: This is only effective if R is compiled with the Intel Math Kernel Library (MKL).
+threads=2
 target_chromosomes="21"
 
 OUT_BASE="./results"
 IBD_PREP_BASE="./example/ibd_prep"
-GLMM_RDS="toy_pheno_glmmkin2randomvec.rds"
+GLMM_RDS="toy_pheno_glmmkin2randomvec.rds" 
 script_name="src/HiFiMAP/Step2_Run_HiFiMAP.R"
 
 mkdir -p "$OUT_BASE"
 
 # ==========================================
-# EXECUTION
+# EXECUTION LOOP
 # ==========================================
 for chr in $target_chromosomes; do
-    echo "=========================================="
+    ibd_out_dir="${IBD_PREP_BASE}/chr${chr}"
+    
+    echo "=================================================="
     echo "Processing Chromosome $chr..."
-    echo "=========================================="
-    
-    # ---------------------------------------------------------
-    # ALIGNMENT FIX: Rename Python outputs to sequential chunks
-    # ---------------------------------------------------------
-    echo "Aligning .mtx and .diff files to sequential chunks..."
-    chunk_count=1
-    
-    # Use sort -V to ensure natural numeric sorting (e.g., 250 comes before 1000)
-    for mtx_file in $(ls ${IBD_PREP_BASE}/chr${chr}/ibd_mat_*.mtx 2>/dev/null | sort -V); do
-        # Extract the actual site number from the filename
-        site_num=$(basename "$mtx_file" | grep -o -E '[0-9]+')
-        
-        # Only rename if it isn't already the correct sequential chunk number
-        if [ "$site_num" != "$chunk_count" ]; then
-            mv "${IBD_PREP_BASE}/chr${chr}/ibd_mat_${site_num}.mtx" "${IBD_PREP_BASE}/chr${chr}/ibd_mat_${chunk_count}.mtx"
-            
-            # Also rename the corresponding .diff file
-            if [ -f "${IBD_PREP_BASE}/chr${chr}/delta_${site_num}.diff" ]; then
-                mv "${IBD_PREP_BASE}/chr${chr}/delta_${site_num}.diff" "${IBD_PREP_BASE}/chr${chr}/delta_${chunk_count}.diff"
-            fi
-        fi
-        ((chunk_count++))
-    done
-    echo "Alignment complete."
-    # ---------------------------------------------------------
+    echo "=================================================="
 
-    echo "Launching jobs for Chromosome $chr..."
+    if [ ! -d "$ibd_out_dir" ]; then
+        echo "  [ERROR] Input dir not found for Chr $chr: $ibd_out_dir"
+        continue
+    fi
+
+    # Read the ACTUAL site numbers from the freshly generated Python files
+    all_checkpoints=($(ls "${ibd_out_dir}"/ibd_mat_*.mtx 2>/dev/null | xargs -n 1 basename | sed 's/ibd_mat_//;s/\.mtx//' | sort -n))
+    num_avail_checkpoints=${#all_checkpoints[@]}
+
+    if [ "$num_avail_checkpoints" -eq 0 ]; then
+        echo "  [ERROR] No .mtx checkpoints found in $ibd_out_dir. Skipping."
+        continue
+    fi
+
+    total_sites=$(tail -n +2 "${ibd_out_dir}/sites.txt" | wc -l)
     
-    for chunk in $(seq 1 $n_analysis_chunks); do
+    echo "  [LAUNCH] Chr $chr | Spawning exactly $num_avail_checkpoints parallel chunks..."
+
+    # --- LAUNCH CHUNKS ---
+    for (( j=0; j<num_avail_checkpoints; j++ )); do
         
-        # Queue Management
-        running_jobs=$(pgrep -f "$script_name" | wc -l)
-        if [ "$running_jobs" -ge "$min_jobs" ]; then
-            while [ "$running_jobs" -ge "$min_jobs" ]; do
-                sleep 5
-                running_jobs=$(pgrep -f "$script_name" | wc -l)
-            done
+        start_idx=${all_checkpoints[$j]}
+        
+        # Calculate End Index
+        next_job_index=$((j + 1))
+        if [ "$next_job_index" -lt "$num_avail_checkpoints" ]; then
+            end_idx=$(( ${all_checkpoints[$next_job_index]} - 1 ))
+        else
+            end_idx=$((total_sites - 1))
         fi
-        
-        # Launch Chunk in background
-        out_file="${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk${chunk}.txt"
-        
+
+        chunk=$((j+1))
+        outfile_prefix="${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk${chunk}"
+
         Rscript "$script_name" \
-            "$chr" "$seed" "toy_pheno" "$threads" \
-            "$GLMM_RDS" "${IBD_PREP_BASE}/chr${chr}" \
-            "$chunk" "$n_analysis_chunks" > "${out_file}.log" 2>&1 &
+            "$chr" \
+            "$seed" \
+            "$outfile_prefix" \
+            "$threads" \
+            "$GLMM_RDS" \
+            "$ibd_out_dir" \
+            "$start_idx" \
+            "$end_idx" > "${outfile_prefix}.log" 2>&1 &
             
     done
-    
-    # Wait for all chunks on this chromosome to finish
+
+    echo "  [MONITOR] All chunks dispatched. Waiting for completion..."
     wait 
-    
-    # Merge chunks
-    echo "Merging results for Chromosome $chr..."
+
+    echo "  [MERGE] Merging results for Chromosome $chr..."
     final_out="${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}.txt"
     chunk1="${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk1.txt"
     
     if [ -f "$chunk1" ]; then
         head -n 1 "$chunk1" > "$final_out"
-        for chunk in $(seq 1 $n_analysis_chunks); do
-            tail -n +2 -q "${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk${chunk}.txt" >> "$final_out"
-            rm "${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk${chunk}.txt"* # Cleanup
+        count=0
+        for (( j=1; j<=num_avail_checkpoints; j++ )); do
+            f="${OUT_BASE}/HiFiMAP_toy_pheno_chr${chr}_chunk${j}.txt"
+            if [ -f "$f" ]; then
+                tail -n +2 -q "$f" >> "$final_out"
+                rm "$f" 
+                ((count++))
+            fi
         done
+        echo "  [SUCCESS] Chr $chr: Merged $count chunks -> $final_out"
     fi
 done
 
