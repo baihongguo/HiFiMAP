@@ -3,7 +3,7 @@ library(Matrix)
 library(methods)
 library(Rcpp)
 
-source("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/pval_caculation_functions.R")
+source("src/HiFiMAP/pval_caculation_functions.R")
 
 # --- Helper: Load dK ---
 read_diff_as_dK <- function(diff_file, n_hap) {
@@ -27,6 +27,7 @@ start_idx      <- as.numeric(cmd[6])
 end_idx        <- as.numeric(cmd[7])
 
 Sys.setenv(MKL_NUM_THREADS = threads)
+set.seed(seed)
 
 t1 <- proc.time()
 
