@@ -7,7 +7,7 @@ library(fastmatch)
 
 # Source the random vector conversion helper
 # (Ensure this path is correct for your environment)
-source("/HGCNT95FS/ADDLIE/work/Test/FiMAP/simulation/toy/glmmkin2randomvec.R")
+source("src/HiFiMAP/glmmkin2randomvec.R")
 
 # -------------------------------------------------------------------------
 # 1. PARSE ARGUMENTS
@@ -51,7 +51,7 @@ if(is.character(kin_obj)) {
 pheno <- fread(pheno.file, data.table = FALSE)
 
 # Filter Phenotypes to match Kinship samples
-pheno <- subset(pheno, ID %in% rownames(kin))
+pheno <- subset(pheno, id %in% rownames(kin))
 pheno <- pheno[!apply(is.na(pheno), 1, any), ]
 
 cat("Effective sample size:", nrow(pheno), "\n")
@@ -61,9 +61,9 @@ cat("Effective sample size:", nrow(pheno), "\n")
 # -------------------------------------------------------------------------
 # Adjust the formula "Phenotype ~ Age + Sex" as needed for your real data
 
-obj <- try(glmmkin(as.formula("Phenotype ~ Age + Sex"), 
+obj <- try(glmmkin(as.formula("pheno ~ covar"), 
                    data = pheno, 
-                   id = "ID", 
+                   id = "id", 
                    kins = kin, 
                    family = gaussian(link = "identity"), 
                    verbose = TRUE))
@@ -97,8 +97,8 @@ if (is.null(obj$Sigma_i)) {
 }
 
 # Prepare Cholesky of Kinship for Random Vector generation
-match.idx1 <- match(pheno$ID, rownames(kin))
-match.idx2 <- match(pheno$ID, colnames(kin))
+match.idx1 <- match(pheno$id, rownames(kin))
+match.idx2 <- match(pheno$id, colnames(kin))
 tmpibd <- kin[match.idx1, match.idx2]
 IBD.chol <- chol(tmpibd)
 
