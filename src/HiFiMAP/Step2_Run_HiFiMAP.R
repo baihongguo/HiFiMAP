@@ -27,7 +27,6 @@ start_idx      <- as.numeric(cmd[6])
 end_idx        <- as.numeric(cmd[7])
 
 Sys.setenv(MKL_NUM_THREADS = threads)
-set.seed(seed)
 
 t1 <- proc.time()
 
