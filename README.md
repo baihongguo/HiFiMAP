@@ -202,4 +202,4 @@ chr     pos       n.ibd.segs    p.value
 ## References
 <p>If you use HiFiMAP, please cite
 <li>Guo, B. et al. HiFiMAP: High-resolution fast identity-by-descent mapping test. <em>medRxiv</em> 2026.05.06.26352570
-[<b>Preprint</b>]. May 17, 2026. DOI: <a href="https://www.medrxiv.org/content/10.64898/2026.05.06.26352570v1">[2026.05.06.26352570](https://doi.org/10.64898/2026.05.06.26352570)</a>.</li></p>
+[<b>Preprint</b>]. May 17, 2026. DOI: <a href="https://www.medrxiv.org/content/10.64898/2026.05.06.26352570v1">(https://doi.org/10.64898/2026.05.06.26352570)</a>.</li></p>
