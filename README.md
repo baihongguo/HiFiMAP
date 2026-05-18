@@ -15,7 +15,7 @@ cd HiFiMAP
 ```
 
 ## Preparations
-The software is developed and tested in Linux HPC environments. 
+The software is developed and tested in Linux environments. 
 
 **Python Dependencies (Python >= 3.6):**
 * `numpy`
@@ -198,3 +198,8 @@ chr     pos       n.ibd.segs    p.value
 21	14250602	1056	0.8867795	
 21	14256336	1057	0.8965234
 ```
+
+## References
+<p>If you use HiFiMAP, please cite
+<li>Guo, B. et al. HiFiMAP: High-resolution fast identity-by-descent mapping test. <em>medRxiv</em> 2026.05.06.26352570
+[<b>Preprint</b>]. May 17, 2026. DOI: <a href="https://www.medrxiv.org/content/10.64898/2026.05.06.26352570v1">2026.05.06.26352570</a>.</li></p>
