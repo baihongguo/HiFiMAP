@@ -64,7 +64,7 @@ python3 src/hapIBD_parsing/parsing_hapIBD.py \
 <br />
 
 ### Step 1: Fit the Null GLMM Model (R)
-Next, fit the null model using your phenotypes and global kinship matrix. **This step only needs to be run once per phenotype**, regardless of how many chromosomes you analyze. Please modify the glmmkin formula in Step1_Save_null_model_HiFiMAP.R based on your phenotype and covariate names. ID column should be named id.
+Next, fit the null model using your phenotypes and global kinship matrix through the glmmkin function from the GMMAT package. **This step only needs to be run once per phenotype**, regardless of how many chromosomes you analyze. Please modify the glmmkin formula in Step1_Save_null_model_HiFiMAP.R based on your phenotype and covariate names. ID column should be named id.
 
 ```bash
 Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
