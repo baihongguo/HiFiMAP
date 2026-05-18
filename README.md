@@ -35,7 +35,7 @@ The software is developed and tested in Linux environments.
 Based on the repository structure, all test files are located in the `example/` directory, and all source codes are in the `src/` directory. Suppose you want to run a test analysis for chromosome 21 using the provided toy data:
 
 * `example/chr21_toy.ibd.gz`: IBD segments generated from [hapIBD](https://github.com/browning-lab/hap-ibd).
-* `example/chr21_toy.vcf.gz`: The corresponding VCF file used to generate the IBDs.
+* `example/chr21_toy.vcf.gz`: The corresponding VCF file used to generate the IBD segments.
 * `example/toy_phenotype.txt`: Contains individual IDs, phenotype, and covariates (e.g., age, sex).
 * `example/toy_global_kinship.RData`: The global IBD (kinship) matrix.
 
