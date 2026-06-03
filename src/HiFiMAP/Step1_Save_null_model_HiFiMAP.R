@@ -67,6 +67,8 @@ obj <- try(glmmkin(as.formula("pheno ~ covar"),
                    kins = kin, 
                    family = gaussian(link = "identity"), 
                    verbose = TRUE))
+# For binary phenotypes
+# obj <- try(glmmkin(as.formula(paste0("PhenotypeBin ~ covar")), data = pheno, id = "ID", kins = kin, family = binomial(link = 'logit'), verbose = TRUE))
 
 if(inherits(obj, "try-error")) stop("Error: cannot fit the LMM")
 
