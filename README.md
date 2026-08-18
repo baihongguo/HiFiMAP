@@ -4,7 +4,7 @@ High resolution fast identity-by-descent (IBD) mapping test
 Current version: 2.0.0 (Optimized Streaming Pipeline)
 
 ## Overview
-The new HiFiMAP pipeline has been rebuilt for scalability and efficiency. It uses a highly optimized Python preparser to convert IBD segments into chunked sparse matrices (`.mtx`) and differential updates (`.diff`). The main R program utilizes C++ (`Rcpp`) to stream these updates, allowing for fast, parallelized genome-wide association testing without frequently loading massive IBD matrices into RAM. Both continuous and binary phenotypes are applicable.
+The new HiFiMAP pipeline has been rebuilt for scalability and efficiency. It uses a highly optimized Python preparser to convert IBD segments into chunked sparse matrices (`.mtx`) and differential updates (`.diff`). The main R program utilizes C++ (`Rcpp`) to stream these updates, allowing for fast, parallelized genome-wide association testing without frequently loading massive IBD matrices into RAM.
 
 ## Quick Installation 
 
@@ -36,7 +36,7 @@ Based on the repository structure, all test files are located in the `example/` 
 
 * `example/chr21_toy.ibd.gz`: IBD segments generated from [hapIBD](https://github.com/browning-lab/hap-ibd).
 * `example/chr21_toy.vcf.gz`: The corresponding VCF file used to generate the IBD segments.
-* `example/toy_phenotype.txt`: Contains individual IDs, phenotype (continuous or binary), and covariates (e.g., age, sex).
+* `example/toy_phenotype.txt`: Contains individual IDs, phenotype (currently continuous only), and covariates (e.g., age, sex).
 * `example/toy_global_kinship.RData`: The global IBD (kinship) matrix.
 
 ### Step 0: Pre-parse the IBD Segments (Python)
@@ -64,7 +64,7 @@ python3 src/hapIBD_parsing/parsing_hapIBD.py \
 <br />
 
 ### Step 1: Fit the Null GLMM Model (R)
-Next, fit the null model using your phenotypes and global kinship matrix through the glmmkin function from the GMMAT package. **This step only needs to be run once per phenotype**, regardless of how many chromosomes you analyze. Please modify the glmmkin formula in Step1_Save_null_model_HiFiMAP.R based on your phenotype (continuous or binary (coded as 0/1)) and covariate names. ID column should be named id.
+Next, fit the null model using your phenotypes and global kinship matrix through the glmmkin function from the GMMAT package. **This step only needs to be run once per phenotype**, regardless of how many chromosomes you analyze. Please modify the glmmkin formula in Step1_Save_null_model_HiFiMAP.R based on your phenotype (currently continuous only) and covariate names. ID column should be named id.
 
 ```bash
 Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
