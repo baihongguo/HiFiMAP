@@ -3,11 +3,13 @@
 library(data.table)
 library(GMMAT)
 library(Matrix)
-library(fastmatch)
 
-# Source the random vector conversion helper
-# (Ensure this path is correct for your environment)
-source("src/HiFiMAP/glmmkin2randomvec.R")
+# Load the random vector helper from the folder that contains this script, so it runs from any working directory
+script_dir <- local({
+  f <- sub("^--file=", "", grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE))
+  if (length(f) == 1) dirname(normalizePath(f)) else "src/HiFiMAP"
+})
+source(file.path(script_dir, "glmmkin2randomvec.R"))
 
 # -------------------------------------------------------------------------
 # 1. PARSE ARGUMENTS

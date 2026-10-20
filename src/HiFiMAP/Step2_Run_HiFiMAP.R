@@ -3,7 +3,12 @@ library(Matrix)
 library(methods)
 library(Rcpp)
 
-source("src/HiFiMAP/pval_caculation_functions.R")
+# Helper functions are loaded from the folder that contains this script, so it runs from any working directory
+script_dir <- local({
+  f <- sub("^--file=", "", grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE))
+  if (length(f) == 1) dirname(normalizePath(f)) else "src/HiFiMAP"
+})
+source(file.path(script_dir, "pval_caculation_functions.R"))
 
 # --- Helper: Load dK ---
 read_diff_as_dK <- function(diff_file, n_hap) {
@@ -43,10 +48,18 @@ eigenmat_offset <- 2 * crossprod(random_vecs) - Q_offset/(N-ncovars) * obj1$RSig
 
 # 2. Load Maps
 sites <- fread(file.path(ibd_dir, "sites.txt"))
-samples_vcf <- fread(file.path(ibd_dir, "samples.txt"), header=F)$V1
+# The subjects of the null model can be any subset of the VCF samples used for hap-ibd and Step 0, in any order.
+# IDs are compared as text, so that e.g. "007" and "7" are not treated as the same ID.
+samples_vcf <- fread(file.path(ibd_dir, "samples.txt"), header=F, colClasses="character")$V1
 N_vcf <- length(samples_vcf)
 
-match_idx <- match(obj1$id_include, samples_vcf)
+match_idx <- match(as.character(obj1$id_include), samples_vcf)
+if (anyNA(match_idx)) {
+  stop(sprintf("%d of %d subjects in the null model are not in %s (e.g. %s); they must be VCF sample IDs.",
+               sum(is.na(match_idx)), N, file.path(ibd_dir, "samples.txt"),
+               paste(head(obj1$id_include[is.na(match_idx)], 5), collapse = ", ")))
+}
+cat("Subjects:", N, "of the", N_vcf, "VCF samples\n")
 rows <- rep(1:N, each=2)
 cols <- c(rbind(2*match_idx - 1, 2*match_idx))
 P_proj <- sparseMatrix(i = rows, j = cols, x = 1, dims = c(N, N_vcf * 2))
