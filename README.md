@@ -1,7 +1,7 @@
 # HiFiMAP
 High resolution fast identity-by-descent (IBD) mapping test
 <br />
-Current version: 2.0.0 (Optimized Streaming Pipeline)
+Current version: 2.0.1 (Optimized Streaming Pipeline; see [version history](#version-history))
 
 ## Overview
 The new HiFiMAP pipeline has been rebuilt for scalability and efficiency. It uses a highly optimized Python preparser to convert IBD segments into chunked sparse matrices (`.mtx`) and differential updates (`.diff`). The main R program utilizes C++ (`Rcpp`) to stream these updates, allowing for fast, parallelized genome-wide association testing without frequently loading massive IBD matrices into RAM.
@@ -23,7 +23,6 @@ The software is developed and tested in Linux environments.
 **R Dependencies (R >= 4.0.0):**
 * `data.table`
 * `Matrix`
-* `fastmatch`
 * `GMMAT`
 * `Rcpp`
 * `CompQuadForm`
@@ -54,8 +53,8 @@ python3 src/hapIBD_parsing/parsing_hapIBD.py \
 
 | Argument | Description |
 | ------------- | ------------- |
-| `--ibd` | The IBD segment file output from hapIBD. |
-| `--vcf` | The reference VCF file to extract exact SNP positions and sample IDs. |
+| `--ibd` | The IBD segment file output from hapIBD. Its sample IDs must be the VCF sample IDs; the parser reports how many IBD records match and stops with an error if none do. |
+| `--vcf` | The reference VCF file to extract exact SNP positions and sample IDs (normally the VCF used to run hapIBD). |
 | `--output` | The directory where the chunked matrices and diffs will be saved. |
 | `--n-checkpoints` | Number of chunks to divide the chromosome into (e.g., `20`). This controls parallelization scaling in Step 2. Set this number to be less than the number of CPUs you have for better performance, recommended is 20-30. |
 
@@ -81,7 +80,11 @@ Rscript src/HiFiMAP/Step1_Save_null_model_HiFiMAP.R \
 | `toy_pheno` | Prefix for the output file. |
 | `12345` | Random seed for reproducibility. |
 
-*(This generates the null model object: `toy_pheno_glmmkin2randomvec.rds` in your root directory. The subjects in the phenotype file can be a subset of the individuals included in your vcf files used for step0 and hapIBD).*
+*(This generates the null model object `toy_pheno_glmmkin2randomvec.rds` in the working directory.)*
+
+**Subjects:** the subjects in the phenotype file can be any subset of the samples in the VCF used for hapIBD and Step 0, in any order. For example, you can call and parse the IBD segments once for the whole cohort, then fit null models for different phenotypes on different subsets of it.
+- **Step 1** keeps the subjects that are in both the phenotype file and the kinship matrix and have no missing values.
+- **Step 2** keeps the IBD sharing among those subjects only. It stops with an error if a subject is not a VCF sample (listed in `samples.txt` after Step 0).
 
 <br />
 
@@ -189,15 +192,26 @@ echo "Pipeline Complete!"
 ```
 
 ### Final Output
-The final merged result file (`results/HiFiMAP_toy_pheno_chr21.txt`) will contain the association statistics for every tested site:
+The final merged result file (`results/HiFiMAP_toy_pheno_chr21.txt`) will contain the association statistics for every tested site. For example, with the toy data and seed `12345`:
 
 ```text 
 chr     pos       n.ibd.segs    p.value
-21	14240779	1052	0.8847846	
-21	14242245	1054	0.8866947	
-21	14250602	1056	0.8867795	
-21	14256336	1057	0.8965234
+21	14240779	1052	0.6283424	
+21	14242245	1054	0.632808	
+21	14250602	1056	0.6316593	
+21	14256336	1057	0.6555438
 ```
+The p-values are computed with simulated random vectors from Step 1. They therefore differ slightly with the seed, and can differ slightly between systems; with seeds 1, 2 and 3 these four p-values ranged from 0.61 to 0.65. `n.ibd.segs` does not depend on the seed.
+
+## Version history
+**2.0.1**
+- `parsing_hapIBD.py` reports how many IBD records match the VCF sample IDs and stops with an error if none match. Previously it silently wrote empty checkpoint matrices and no `.diff` files. It also skips a header line in the IBD file.
+- Step 2 stops with a clear error if a subject of the null model is not a VCF sample, and compares IDs as text.
+- Steps 1 and 2 load their helper scripts from their own folder, so they run from any working directory.
+- Removed the unused `fastmatch` dependency.
+- Updated the example output to the current toy data.
+
+**2.0.0**: optimized streaming pipeline.
 
 ## References
 <p>If you use HiFiMAP, please cite
