@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Version: 1.0.0
+Version: 1.1.0
+  - Stops with a clear error when no IBD record matches the VCF sample IDs (previously it silently wrote empty
+    checkpoint matrices and no diff files), and reports how many records were matched.
+  - Skips a header line in the IBD file, if present.
   - Auto-generates sites.txt and samples.txt for downstream R integration.
   - Optimize resume feature, now can seamlessly resume from the diff files generating phase or mtx files generating phase if interrupted.
 """
@@ -217,6 +220,9 @@ def parse_ibd_to_diffs(ibd_file: str, vcf_data, diff_dir: str, mask_intervals,
     processed = lines_done
     start_time = time.perf_counter()
     created_files = set()
+    n_records = 0                    # IBD records (data lines) read in this run
+    matched = 0                      # IBD records whose two samples are both in the VCF
+    unmatched_ids = []               # a few sample IDs that are not in the VCF, for the error message
 
     try:
         for line in f_in:
@@ -226,10 +232,16 @@ def parse_ibd_to_diffs(ibd_file: str, vcf_data, diff_dir: str, mask_intervals,
                 continue
 
             samp1, hap1_str, samp2, hap2_str, _, pos1_str, pos2_str = parts[:7]
+            if not (hap1_str.isdigit() and hap2_str.isdigit()):
+                continue             # header line (hap-ibd output has none, but some files do)
+            n_records += 1
             key1 = f"{samp1}_{hap1_str}"
             key2 = f"{samp2}_{hap2_str}"
             if key1 not in hap_to_idx or key2 not in hap_to_idx:
+                if len(unmatched_ids) < 5:
+                    unmatched_ids.append(samp1 if key1 not in hap_to_idx else samp2)
                 continue
+            matched += 1
 
             try:
                 pos1 = int(pos1_str)
@@ -271,6 +283,17 @@ def parse_ibd_to_diffs(ibd_file: str, vcf_data, diff_dir: str, mask_intervals,
 
     finally:
         f_in.close()
+
+    new_records = n_records
+    print(f"  IBD records read: {new_records}; matched to VCF samples: {matched}")
+    if new_records > 0 and matched == 0:
+        raise RuntimeError(
+            "None of the IBD records matched the VCF sample IDs, so no IBD sharing would be recorded. "
+            f"Example IBD sample IDs: {unmatched_ids}; example VCF sample IDs: {sample_ids[:5]}. "
+            "The IBD file must use the same sample IDs as the VCF (e.g. run hap-ibd on this VCF).")
+    if matched < new_records:
+        print(f"  [WARNING] {new_records - matched} IBD records skipped because a sample is not in the VCF "
+              f"(e.g. {unmatched_ids}).")
 
     if os.path.exists(checkpoint_file):
         os.remove(checkpoint_file)
